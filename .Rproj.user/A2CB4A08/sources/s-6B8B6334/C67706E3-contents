@@ -1,0 +1,15 @@
+\name{betalinkpart}
+\alias{betalinkpart}
+\title{partitioning interaction turnover}
+\usage{
+beta.sor()
+beta.sor.dist()
+beta.novotny ()
+beta.novotny.dist()
+}
+\description{
+ return partitions of interaction turnover components
+}
+\examples{
+ # beta.sor()
+}

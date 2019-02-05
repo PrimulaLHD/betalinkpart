@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1549382161097.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3199442064",
+    "id" : "3176BBFF",
+    "lastKnownWriteTime" : 1549382876,
+    "last_content_update" : 1549382876422,
+    "path" : "~/betalinkpart/man/m2f.Rd",
+    "project_path" : "man/m2f.Rd",
+    "properties" : {
+        "cursorPosition" : "9,0",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_doc"
+}

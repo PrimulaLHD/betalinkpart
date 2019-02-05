@@ -1,0 +1,280 @@
+
+# check and install dependt packages
+load_and_install <- function(x) {
+    if(!require(x, character.only = TRUE)) {
+        install.packages(x)
+        library(x, character.only = TRUE)
+    }
+} # This function from Poislot et al 2017
+
+
+load_and_install("bipartite")
+
+# interaction matrix to data frame
+m2f <- function(m){
+    df <- as.data.frame.table(m)
+    names(df) <- c("Plant","Animal","Value")
+    df<-subset(df,Value>0)
+    df
+}
+
+
+
+#multi-site interaction dataframe to interation matices with equal dimensions
+multi_equal <- function(df,varnames=c("Plant","Animal","WebID","freq")){
+    network_list <- frame2webs(df,varnames = varnames,type.out = "list",emptylist = FALSE)
+    return(network_list)
+}
+
+
+
+#R function modified from Poisot et al. (2012) and Simanonok and  Burkle 2014 to calculate partitions of interaction turnover
+######################################################################################################################################
+####First function used to calculate partitions of interaction turnover for two sites (networks)
+
+beta.sor = function(w1,w2){
+    Z<-(w1)-(w2)
+    #Presence/absence matrices only
+    #w1 and w2 must have equal dimensions
+    #Bcc is interaction turnover
+    a<-sum(w1[w1==w2])
+    b<-length(Z[Z==1])
+    c<-length(Z[Z==-1])
+    BWN<-((b+c)/(2*a+b+c))
+    # For Z, if = 0 it must be either a shared interaction or a lack of an interaction
+
+    #BP: turnover of interactions due to lower trophic level turnover (rows of matrices)
+    #BPb: Z=1, rows must be empty in w2, columns must be filled in w2
+    #BPc: Z=-1, rows must be empty in w1, columns must be filled in w1
+
+    BPb<-vector("numeric",length=1)
+    BPb1<-Z[rowSums(w2)==0,colSums(w2)>0]
+    BPb1<-BPb1[BPb1==1]
+    BPb<-length(BPb1)
+
+    BPc<-vector("numeric",length=1)
+    BPc1<-Z[rowSums(w1)==0,colSums(w1)>0]
+    BPc1<-BPc1[BPc1==-1]
+    BPc<-length(BPc1)
+
+    #BA: turnover of interactions due to upper trophic level turnover (columns of matrices)
+    #BAb: Z=1, rows must be filled in w2, columns must be empty in w2
+    #BAc: Z=-1, rows must be filled in w1, columns must be empty in w1
+
+    BAb<-vector("numeric",length=1)
+    BAb1<-Z[rowSums(w2)>0,colSums(w2)==0]
+    BAb1<-BAb1[BAb1==1]
+    BAb<-length(BAb1)
+
+    BAc<-vector("numeric",length=1)
+    BAc1<-Z[rowSums(w1)>0,colSums(w1)==0]
+    BAc1<-BAc1[BAc1==-1]
+    BAc<-length(BAc1)
+
+    #BPA: interaction turnover due to simultaneous turnover of both trophic levels
+    #BPAb: Z=1, rows must be empty, columns must be empty
+    #BPAc Z=-1, rows must be empty, columns must be empty
+
+    BPAb<-vector("numeric",length=1)
+    BPAb1<-Z[rowSums(w2)==0,colSums(w2)==0]
+    BPAb1<-BPAb1[BPAb1==1]
+    BPAb<-length(BPAb1)
+
+    BPAc<-vector("numeric",length=1)
+    BPAc1<-Z[rowSums(w1)==0,colSums(w1)==0]
+    BPAc1<-BPAc1[BPAc1==-1]
+    BPAc<-length(BPAc1)
+
+    #See Novotny 2009;Trøjelsgaard et al 2015 for more detail
+    BPA<-(BPAb+BPAc)/(2*a+b+c)
+    BP<-(BPb+BPc)/(2*a+b+c)
+    BA<-(BAb+BAc)/(2*a+b+c)
+
+    #Bos is the rewiring, since BWN = BP + BA + BPA + BOS,
+    #and we calculated all other partitions, we can subtract to find it
+    BOS=(BWN-BP-BA-BPA)
+    BOS<-ifelse(BOS<0.00001,0,BOS)
+    #Whichever interactions do not change must be conserved,
+    #therefore 1-BWN = proportion of links conserved between two networks
+    prop.links.conserved=(1-BWN)
+
+    #Additive total for species turnover: simultaneous + Animal+ plant
+    BST=(BP+BA+BPA)
+
+    return(list(prop.links.conserved = prop.links.conserved,
+                BST = BST, BP = BP, BA = BA, BOS = BOS, BPA = BPA, BWN = BWN))
+}
+
+
+###########################################################################################################################
+###The second function used for comparing more than two Sites (networks)
+
+
+beta.sor.dist = function(W,...){
+    dWN = matrix(NA,ncol=length(W),nrow=length(W))
+    colnames(dWN) = names(W)
+    rownames(dWN) = names(W)
+    dBWN = dWN
+    dBPA = dWN
+    dBP = dWN
+    dBA = dWN
+    dBOS = dWN
+    for(i in c(1:(length(W)-1))){
+        for(j in c((i+1):(length(W)))){
+            partition = beta.sor(W[[i]],W[[j]],...)
+            dBWN[j,i]	= partition$BWN
+            dBPA[j,i]	= partition$BPA
+            dBP[j,i]	= partition$BP
+            dBA[j,i]	= partition$BA
+            dBOS[j,i]	= partition$BOS
+        }
+    }
+    distances = list(BWN=dBWN, BPA=dBPA, BP=dBP, BA=dBA, BOS=dBOS)
+    distances = lapply(distances,as.dist)
+    return(distances)
+}
+
+
+
+#R function modified from Poisot et al. (2012) to calculate partitions of interaction turnover according to Novotny (2009).
+# Simanonok and  Burkle 2014
+######################################################################################################################################
+####Third function used to calculate partitions of interaction turnover according to Novotny (2009), for two site(matrices)
+
+beta.novotny = function(w1,w2){
+    Z<-(w1)-(w2)
+    #Presence/absence matrices only
+    #w1 and w2 must have equal dimensions
+    #Bcc is interaction turnover
+    a<-sum(w1[w1==w2])
+    b<-length(Z[Z==1])
+    c<-length(Z[Z==-1])
+    Bcc<-((b+c)/(a+b+c))
+    # For Z, if = 0 it must be either a shared interaction or a lack of an interaction
+
+    #BP: turnover of interactions due to lower trophic level turnover (rows of matrices)
+    #BPb: Z=1, rows must be empty in w2, columns must be filled in w2
+    #BPc: Z=-1, rows must be empty in w1, columns must be filled in w1
+
+    BPb<-vector("numeric",length=1)
+    BPb1<-Z[rowSums(w2)==0,colSums(w2)>0]
+    BPb1<-BPb1[BPb1==1]
+    BPb<-length(BPb1)
+
+    BPc<-vector("numeric",length=1)
+    BPc1<-Z[rowSums(w1)==0,colSums(w1)>0]
+    BPc1<-BPc1[BPc1==-1]
+    BPc<-length(BPc1)
+
+    #BH: turnover of interactions due to upper trophic level turnover (columns of matrices)
+    #BHb: Z=1, rows must be filled in w2, columns must be empty in w2
+    #BHc: Z=-1, rows must be filled in w1, columns must be empty in w1
+
+    BHb<-vector("numeric",length=1)
+    BHb1<-Z[rowSums(w2)>0,colSums(w2)==0]
+    BHb1<-BHb1[BHb1==1]
+    BHb<-length(BHb1)
+
+    BHc<-vector("numeric",length=1)
+    BHc1<-Z[rowSums(w1)>0,colSums(w1)==0]
+    BHc1<-BHc1[BHc1==-1]
+    BHc<-length(BHc1)
+
+    #BPH: interaction turnover due to simultaneous turnover of both trophic levels
+    #BPHb: Z=1, rows must be empty, columns must be empty
+    #BPHc Z=-1, rows must be empty, columns must be empty
+
+    BPHb<-vector("numeric",length=1)
+    BPHb1<-Z[rowSums(w2)==0,colSums(w2)==0]
+    BPHb1<-BPHb1[BPHb1==1]
+    BPHb<-length(BPHb1)
+
+    BPHc<-vector("numeric",length=1)
+    BPHc1<-Z[rowSums(w1)==0,colSums(w1)==0]
+    BPHc1<-BPHc1[BPHc1==-1]
+    BPHc<-length(BPHc1)
+
+    #See Novotny 2009 for more detail
+    BPH<-(BPHb+BPHc)/(a+b+c)
+    BP<-(BPb+BPc)/(a+b+c)
+    BH<-(BHb+BHc)/(a+b+c)
+
+    #B0 is the rewiring, since Bcc = BP + BH + BPH + B0,
+    #and we calculated all other partitions, we can subtract to find it
+    B0=(Bcc-BP-BH-BPH)
+    B0<-ifelse(B0<0.00001,0,B0)
+    #Whichever interactions do not change must be conserved,
+    #therefore 1-Bcc = proportion of links conserved between two networks
+    prop.links.conserved=(1-Bcc)
+
+    #Additive total for species turnover: simultaneous + herbivore + plant
+    BST=(BP+BH+BPH)
+
+    return(list(prop.links.conserved = prop.links.conserved, BST = BST, BP = BP, BH = BH, B0 = B0, BPH = BPH, Bcc = Bcc))
+}
+
+
+###########################################################################################################################
+###The furth function used for comparing more than two (Site) matrices
+
+
+betanew.dist.novotny = function(W,...){
+    dWN = matrix(NA,ncol=length(W),nrow=length(W))
+    colnames(dWN) = names(W)
+    rownames(dWN) = names(W)
+    dBcc = dWN
+    dBPH = dWN
+    dBP = dWN
+    dBH = dWN
+    dB0 = dWN
+    for(i in c(1:(length(W)-1))){
+        for(j in c((i+1):(length(W)))){
+            partition = beta.novotny(W[[i]],W[[j]],...)
+            dBcc[j,i]	= partition$Bcc
+            dBPH[j,i]	= partition$BPH
+            dBP[j,i]	= partition$BP
+            dBH[j,i]	= partition$BH
+            dB0[j,i]	= partition$B0
+        }
+    }
+    distances = list(Bcc=dBcc, BPH=dBPH, BP=dBP, BH=dBH, B0=dB0)
+    distances = lapply(distances,as.dist)
+    return(distances)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

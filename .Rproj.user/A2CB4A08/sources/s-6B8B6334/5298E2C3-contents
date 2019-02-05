@@ -1,0 +1,13 @@
+Package: betalinkpart
+Type: Package
+Title: R packages to calculate partitions of interaction turnover
+Version: 0.1.0
+Author: Hai-Dong Li
+Maintainer: The package maintainer <yourself@somewhere.net>
+Description: This packages provides R functions to caculate partitions of interaction turnover    
+    Please Note: These R function modified from Poisot et al. (2012) and Simanonok and  Burkle 2014.
+    Just for my study. If you use this code and package, please cite the original references.
+    This packages provides two dissimilarity index: Sorensen (Poistot et al. 2012) and Jaccard (Novotny 2009, Simanonok and  Burkle 2014)
+License: GPL
+Encoding: UTF-8
+LazyData: true

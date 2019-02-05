@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1549381906332.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2451515556",
+    "id" : "647FBD9D",
+    "lastKnownWriteTime" : 1549382817,
+    "last_content_update" : 1549382817843,
+    "path" : "~/betalinkpart/man/beta.novotny.Rd",
+    "project_path" : "man/beta.novotny.Rd",
+    "properties" : {
+        "cursorPosition" : "9,0",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_doc"
+}

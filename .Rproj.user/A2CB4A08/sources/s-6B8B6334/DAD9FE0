@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1549382273500.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4269475758",
+    "id" : "DAD9FE0",
+    "lastKnownWriteTime" : 1549382789,
+    "last_content_update" : 1549382789003,
+    "path" : "~/betalinkpart/man/multi_equal.Rd",
+    "project_path" : "man/multi_equal.Rd",
+    "properties" : {
+        "cursorPosition" : "7,37",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 8,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_doc"
+}

@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1549382011933.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "753555879",
+    "id" : "DF02971E",
+    "lastKnownWriteTime" : 1549382809,
+    "last_content_update" : 1549382809908,
+    "path" : "~/betalinkpart/man/beta.sor.dist.Rd",
+    "project_path" : "man/beta.sor.dist.Rd",
+    "properties" : {
+        "cursorPosition" : "10,0",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_doc"
+}
