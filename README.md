@@ -1,5 +1,5 @@
 # betalinkpart
-This package contains R functions to calculate to partitions of interaction turnover.     
+This package contains R functions to calculate two partitions of interaction turnover.     
 Please note: The R functions modified from Poisot et al. (2012) and Simanonok and  Burkle (2014); this package just for my study, if you use this package, please cite the original references.  
 1. Poisot, T., E. Canard, D. Mouillot, N. Mouquet, and D. Gravel. 2012. The dissimilarity of species interaction networks. Ecology Letters 15:1353-1361.  
 2. Novotny , V. 2009. Beta diversity of plant-insect food webs in tropical forests: a conceptual framework. Insect Conservation and Diversity 2:5-9.   
